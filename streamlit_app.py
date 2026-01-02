@@ -4,7 +4,7 @@ import requests
 # ======================================================
 # CONFIG
 # ======================================================
-BACKEND_URL = "http://localhost:8000"
+BACKEND_URL = "https://lexi-evidence-grounded-judicial.onrender.com"
 
 st.set_page_config(
     page_title="LEXI — Evidence-Grounded Judicial Simulation",
