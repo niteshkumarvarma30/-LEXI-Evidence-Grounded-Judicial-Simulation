@@ -2,7 +2,6 @@ import os
 import time
 import httpx
 from supabase import create_client
-from supabase.lib.client_options import ClientOptions
 from postgrest.exceptions import APIError
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -12,7 +11,7 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     raise RuntimeError("SUPABASE_URL / SUPABASE_KEY missing")
 
 # --------------------------------------------------
-# SINGLETON CLIENT (CRITICAL)
+# SINGLETON CLIENT (NO ClientOptions!)
 # --------------------------------------------------
 _client = None
 
@@ -20,19 +19,9 @@ _client = None
 def get_client():
     global _client
     if _client is None:
-        options = ClientOptions(
-            schema="public",
-            headers={
-                "Authorization": f"Bearer {SUPABASE_KEY}",
-                "apikey": SUPABASE_KEY,
-            },
-            storage=None,     # REQUIRED by SDK
-            timeout=10
-        )
         _client = create_client(
             SUPABASE_URL,
-            SUPABASE_KEY,
-            options=options
+            SUPABASE_KEY
         )
     return _client
 
@@ -70,7 +59,7 @@ def insert(table: str, data: dict, retries: int = 3):
 
 
 # --------------------------------------------------
-# SAFE VECTOR SEARCH
+# SAFE VECTOR SEARCH (RPC)
 # --------------------------------------------------
 def fetch_similar_constitution_articles(text: str, top_k: int = 5):
     for attempt in range(3):
