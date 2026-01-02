@@ -1,130 +1,212 @@
-LEXI — Evidence-Grounded Judicial Simulation
+⚖️ LEXI — Evidence-Grounded Judicial Simulation
 
-A human-in-the-loop, AI-assisted judicial decision-support system modeling constitutional screening, adversarial legal workflows, and explainable verdict reasoning.
+LEXI is a human-in-the-loop, AI-assisted judicial decision-support system that models constitutional screening, adversarial legal workflows, and explainable verdict reasoning under the Indian judicial framework.
 
-1) Overview:-
+LEXI is not a legal chatbot and does not adjudicate cases.
+Instead, it enforces legally defined procedural gates and standards of proof, ensuring that humans remain responsible for judgment.
 
-LEXI is an evidence-grounded judicial simulation system designed to reflect real-world legal workflows under the Indian judicial framework.
-The system assists in constitutional screening, evidence processing, and legal reasoning, while ensuring that humans retain authority over final judgments.
 
-Unlike chatbot-style legal tools, LEXI does not adjudicate cases.
-Instead, it enforces legally defined standards of proof and provides transparent, explainable verdict reasoning.
 
+1️⃣ Overview
 
+LEXI is designed to mirror real-world judicial reasoning rather than replace it.
 
+Key characteristics:
 
-2) End-to-End Workflow:-
+Treats incidents as allegations, not conclusions
 
-1)Incident Entry
+Enforces mandatory constitutional screening before case registration
 
--> A petitioner describes an alleged incident.
+Supports adversarial submissions from both parties
 
--> The incident is treated as an allegation, not a conclusion.
+Uses AI only for retrieval and constrained fact extraction
 
+Applies deterministic legal thresholds for verdict logic
 
-2) Constitutional Screening (Mandatory Gate)
+Produces fully explainable verdicts
 
--> Semantic retrieval identifies relevant Articles of the Indian Constitution.
+The system prioritizes legal discipline, transparency, and human accountability.
 
--> Case registration is blocked if no constitutional issue is detected.
 
 
-3) Case Registration
+2️⃣ End-to-End Workflow
+1. Incident Entry
 
--> A unique Case ID is generated.
+A petitioner submits an incident description
 
--> The incident becomes the ground-truth context for all further reasoning.
+The incident is treated strictly as an allegation
 
+No assumptions of illegality are made
 
-4) Adversarial Workflow
 
--> LEXI-A (Petitioner) submits claims and evidence.
+2. Constitutional Screening (Mandatory Gate)
 
--> LEXI-B (Respondent) submits rebuttals and counter-evidence.
+The incident is embedded and matched against the Indian Constitution
 
+Relevant Articles are retrieved from the constitution_articles table using pgvector
 
-5) Evidence Processing
+An LLM explains relevance only (no legal judgment)
 
--> Supports PDF, text, and image uploads.
+Outcome:
 
--> OCR and text extraction are applied as needed.
+If no constitutional issue is detected → case registration is blocked
 
--> Evidence integrity is preserved via hashing.
+If a constitutional violation is detected → user may proceed
 
 
-6) Incident-Anchored Fact Extraction
+3. Case Registration
 
--> AI extracts only facts directly relevant to the incident.
+A unique Case ID is generated
 
--> Irrelevant or hallucinated content is rejected.
+The incident becomes the ground-truth 
+context for the entire case
 
+All future reasoning is anchored to this incident
 
-7) Human Assessment of Proof
 
--> A human evaluator assigns a degree of proof (0–1) against the respondent.
+4. Adversarial Workflow
 
+LEXI-A (Petitioner) submits claims and supporting evidence
 
-8) Deterministic Verdict Logic
+LEXI-B (Respondent) submits rebuttals and counter-evidence
 
--> Fixed legal thresholds are applied:
+This models real adversarial court proceedings
 
--> Criminal: beyond reasonable doubt
 
--> Civil: preponderance of evidence
+5. Evidence Processing
 
+Supported formats:
 
-9) Explainable Verdict Output
+PDF
 
--> Verdict with structured legal reasoning is generated.
+Text files
 
+Images (OCR enabled)
 
+Evidence processing steps:
 
+Text extraction (OCR where required)
 
+Cryptographic hashing for integrity
 
+Semantic embedding for retrieval
 
-3) Design Principles
 
--> Human-in-the-loop by design
+6. Incident-Anchored Fact Extraction
 
--> No AI adjudication
+AI extracts only facts directly related to the registered incident
 
--> Deterministic legal logic
+Constraints enforced:
 
--> Explainable outcomes
+No external knowledge
 
--> Domain-grounded AI usage
+No speculative inference
 
+If irrelevant → output is “NO RELEVANT FACTS”
 
+This prevents hallucination and scope drift
 
-4) Evaluation Summary
 
--> Constitutional article retrieval recall@3: ~90%
+7. Human Assessment of Proof
 
--> Evidence-to-fact extraction precision: ~80–85%
+A human evaluator assigns a degree of proof (0–1) against the respondent
 
--> Verdict decision consistency: 100%
+This represents confidence, not probability
 
--> Human–system verdict agreement: >90%
+The system does not score or override this input
 
--> Evaluation focuses on retrieval quality, relevance, determinism, and human alignment, not classification accuracy.
 
+8. Deterministic Verdict Logic
 
+Based on case type, fixed legal thresholds are applied:
 
-5) Tech Stack
+Criminal cases: Beyond reasonable doubt
 
--> Backend: FastAPI
+Civil cases: Preponderance of evidence
 
--> Database: PostgreSQL (Supabase + pgvector)
 
--> Embeddings: Jina Embeddings
+Rule:
 
--> LLM Assistance: Ollama (mistral:7b-instruct)
+If human score ≥ legal threshold → Guilty
+Else → Not Guilty
 
--> Frontend: Streamlit
+
+No AI judgment is involved.
+
+
+9. Explainable Verdict Output
+
+The final verdict includes:
+
+Verdict (Guilty / Not Guilty)
+
+Case type and legal standard
+
+Threshold applied
+
+Degree of proof provided
+
+Number of incident-relevant facts considered
+
+Clear explanation of why the threshold was or wasn’t met
+
+
+
+3️⃣ Core Design Principles
+
+Human-in-the-loop by design
+
+No AI adjudication
+
+Deterministic legal logic
+
+Explainable outcomes
+
+Domain-grounded AI usage
+
+Procedural discipline over automation
+
+“AI assists with understanding and organizing information, but humans remain responsible for judgment.”
+
+
+
+4️⃣ Evaluation Summary
+
+The system was evaluated on retrieval quality, relevance, determinism, and human alignment, not classification accuracy.
+
+Constitutional article retrieval recall@3: ~90%
+
+Evidence-to-fact extraction precision: ~80–85%
+
+Verdict decision consistency: 100%
+
+Human–system verdict agreement: >90%
+
+
+
+5️⃣ Tech Stack
+
+Backend: FastAPI
+
+Database: PostgreSQL (Supabase + pgvector)
+
+Embeddings: Jina Embeddings
+
+LLM Assistance: Gemini API (constitutional analysis & fact extraction)
+
+Frontend: Streamlit
+
 
 
 
 ⚠️ Disclaimer
 
-This system is for educational and research purposes only.
-It does not provide legal advice or real judicial decisions.
+LEXI is an educational and research-oriented judicial simulation system.
+
+It does not:
+
+Provide legal advice
+
+Replace lawyers or judges
+
+Issue real judicial decisions
