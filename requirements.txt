@@ -1,9 +1,9 @@
 fastapi
 uvicorn
+supabase>=2.4.0
 google-generativeai
+jinja2
+python-multipart
 pytesseract
-pdfplumber
 pillow
-numpy
 requests
-pydantic
