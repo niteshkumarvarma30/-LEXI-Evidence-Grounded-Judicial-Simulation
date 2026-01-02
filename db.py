@@ -1,62 +1,67 @@
 import os
 import time
-from supabase import create_client, Client
-from postgrest.exceptions import APIError
 import httpx
+from supabase import create_client
+from postgrest.exceptions import APIError
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    raise RuntimeError("SUPABASE_URL and SUPABASE_KEY must be set")
+    raise RuntimeError("SUPABASE_URL / SUPABASE_KEY missing")
 
-# Create client with safe timeout
-supabase: Client = create_client(
-    SUPABASE_URL,
-    SUPABASE_KEY,
-    options={
-        "schema": "public",
-        "timeout": 10
-    }
-)
+
+def get_client():
+    return create_client(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        options={
+            "schema": "public",
+            "timeout": 10
+        }
+    )
+
 
 # -----------------------------
-# Retry-safe fetch
+# SAFE FETCH
 # -----------------------------
 def fetch(table: str, filters: dict = None, retries: int = 3):
     for attempt in range(retries):
         try:
-            q = supabase.table(table).select("*")
+            sb = get_client()
+            q = sb.table(table).select("*")
             if filters:
                 for k, v in filters.items():
                     q = q.eq(k, v)
             return q.execute().data or []
         except (APIError, httpx.ReadError):
             if attempt == retries - 1:
-                raise
-            time.sleep(0.5)
+                return []   # ← never crash UI
+            time.sleep(0.7)
 
 
 # -----------------------------
-# Retry-safe insert
+# SAFE INSERT
 # -----------------------------
 def insert(table: str, data: dict, retries: int = 3):
     for attempt in range(retries):
         try:
-            return supabase.table(table).insert(data).execute().data
+            sb = get_client()
+            return sb.table(table).insert(data).execute().data
         except (APIError, httpx.ReadError):
             if attempt == retries - 1:
-                raise
-            time.sleep(0.5)
+                return []
+            time.sleep(0.7)
 
 
 # -----------------------------
-# Vector similarity (safe)
+# SAFE VECTOR SEARCH
 # -----------------------------
 def fetch_similar_constitution_articles(text: str, top_k: int = 5):
     for attempt in range(3):
         try:
-            res = supabase.rpc(
+            sb = get_client()
+            res = sb.rpc(
                 "match_constitution_articles",
                 {
                     "query_text": text,
@@ -66,5 +71,5 @@ def fetch_similar_constitution_articles(text: str, top_k: int = 5):
             return res.data or []
         except (APIError, httpx.ReadError):
             if attempt == 2:
-                raise
-            time.sleep(0.5)
+                return []
+            time.sleep(0.7)
