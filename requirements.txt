@@ -2,8 +2,13 @@ fastapi
 uvicorn
 supabase>=2.4.0
 google-generativeai
-jinja2
 python-multipart
+requests
+
+# Embeddings
+jina
+
+# OCR + PDF
+pdfplumber
 pytesseract
 pillow
-requests
