@@ -1,5 +1,3 @@
-from dotenv import load_dotenv
-load_dotenv()
 
 from fastapi import FastAPI, UploadFile, File, Form
 from schemas import IncidentIn, ClaimIn
